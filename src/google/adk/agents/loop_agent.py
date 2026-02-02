@@ -98,11 +98,12 @@ class LoopAgent(BaseAgent):
 
         async with Aclosing(sub_agent.run_async(ctx)) as agen:
           async for event in agen:
-            yield event
             if event.actions.escalate:
               should_exit = True
+              event.actions.escalate = False  # disable escalate for outer loops
             if ctx.should_pause_invocation(event):
               pause_invocation = True
+            yield event
 
         if should_exit or pause_invocation:
           break  # break inner for loop
